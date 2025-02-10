@@ -210,8 +210,32 @@ export const addLostOrder = (data) => {
     })
 }
 
-export const getAllLostOrder = (data) =>{
+export const getAllLostOrder = (data) => {
     return http.get('/order/lost/all', data, {
+        headers: {
+            'userId': getUserId()
+        }
+    })
+}
+
+export const deleteLostItemOrder = (data) =>{
+    return http.post('/order/lost/delete', data, {
+        headers: {
+            'userId': getUserId()
+        }
+    })
+}
+
+export const operateUserOrder = (data) => {
+    return http.post('/storage/operate', data, {
+        headers: {
+            'userId': getUserId()
+        }
+    })
+}
+
+export const operateUserLogisticsOrder = (data) =>{
+    return http.post('/order/logistics/operate', data, {
         headers: {
             'userId': getUserId()
         }

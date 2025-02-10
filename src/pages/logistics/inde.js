@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Space, message } from 'antd';
+import { Table, Input, Button, Space, message, Tag } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import { getOrderLogisticsList } from '../../api';
+import { getOrderLogisticsList, operateUserLogisticsOrder } from '../../api';
 
 const Logistics = () => {
     const [data, setData] = useState([]);
@@ -14,6 +14,14 @@ const Logistics = () => {
         pageSize: 15,
         total: 0,
     });
+
+    // 状态映射表
+    const statusMap = {
+        Pending: { text: "待处理", color: "orange" },
+        InTransit: { text: "配送中", color: "blue" },
+        Arrived: { text: "已送达", color: "green" },
+        Discarded: { text: "已废弃", color: "red" },
+    };
 
     const fetchData = () => {
         setLoading(true);
@@ -56,16 +64,28 @@ const Logistics = () => {
         fetchData();
     }, [pagination.current, pagination.pageSize]);
 
-    // 丢弃操作
-    const handleDiscard = (key) => {
-        setData(data.filter(item => item.key !== key));
-        message.success('已丢弃');
-    };
-
-    // 确认寄出
-    const confirmDelivery = (key) => {
-        setData(data.filter(item => item.key !== key));
-        message.success('已寄出');
+    // 操作物流订单
+    const handleOrder = (data) => {
+        setLoading(true);
+        operateUserLogisticsOrder({
+            orderId: data.id,
+            operateType: data.operateType
+        })
+        .then((res)=>{
+            if(res === 1){
+                message.success('操作成功！')
+                fetchData();
+            }
+            else{
+                message.error('操作失败！')
+            }
+        })
+        .catch((error) =>{
+            message.error(error.response.data.message)
+        })
+        .finally(() => {
+            setLoading(false);
+        });
     };
 
     // 表格列配置
@@ -91,25 +111,35 @@ const Logistics = () => {
             dataIndex: 'deliveryAddress',
         },
         {
+            title: '物流状态',
+            dataIndex: 'logisticsStatus',
+            render: (status) => {
+                const statusInfo = statusMap[status] || { text: "未知状态", color: "gray" };
+                return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>;
+            }
+        },
+        {
             title: '操作',
             render: (record) => (
                 <Space>
                     <Button
-                        onClick={() => confirmDelivery(record.key)}
+                        disabled={record.logisticsStatus != 'Pending'}
+                        onClick={() => handleOrder({
+                            id: record.id,
+                            operateType: 'Delivery' 
+                        })}
                     >
-                        寄出
+                        确认寄出
                     </Button>
                     <Button
+                        disabled={record.logisticsStatus != 'InTransit'}
                         type="primary"
-                        onClick={() => confirmDelivery(record.key)}
+                        onClick={() => handleOrder({
+                            id: record.id,
+                            operateType: 'Arrival' 
+                        })}
                     >
                         确认送到
-                    </Button>
-                    <Button
-                        danger
-                        onClick={() => handleDiscard(record.key)}
-                    >
-                        删除
                     </Button>
                 </Space>
             ),
