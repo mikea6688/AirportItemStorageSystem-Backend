@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@ant-design/charts": "^2.2.6",
+    "@antv/util": "^3.3.10",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "antd": "^5.23.2",

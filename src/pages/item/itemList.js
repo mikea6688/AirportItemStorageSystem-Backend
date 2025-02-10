@@ -110,11 +110,17 @@ const ItemList = () => {
             sizeType: values.sizeType,
           }
           console.log("🔵 新增数据：", addData);
-          addCabinet(addData);
-          message.success("新增柜子成功");
+          addCabinet(addData).then((res)=>{
+            if(res === 1){
+              loadData(); // 重新加载数据
+              message.success("新增柜子成功！");
+            }
+            else{
+              message.error("新增柜子失败！")
+            }
+          });
         }
         setIsModalOpen(false);
-        loadData(); // 重新加载数据
       } catch {
         message.error("操作失败");
       }
@@ -183,13 +189,19 @@ const ItemList = () => {
       key: "action",
       render: (_, record) => (
         <Space>
-          <Button type="link" onClick={() => showModal(record)}>编辑</Button>
+          <Button 
+            type="link" 
+            onClick={() => showModal(record)} 
+            disabled={record.stored}
+          >
+            编辑
+          </Button>
           <Popconfirm title="确定删除吗？" onConfirm={() => handleDelete(record.id)}>
             <Button type="link" danger>删除</Button>
           </Popconfirm>
         </Space>
       ),
-    },
+    }
   ];
 
   return (
