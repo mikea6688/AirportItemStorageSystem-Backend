@@ -39,7 +39,7 @@ const Logistics = () => {
             .catch((error) => {
                 console.error("获取数据失败:", error);
                 setLoading(false);
-                message.error("获取用户数据失败");
+                message.error("获取物流数据失败");
             });
     };
 
