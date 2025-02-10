@@ -11,16 +11,15 @@ const Statistical = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 默认时间范围：过去一个月
   useEffect(() => {
-    const endDate = dayjs(); // 当前日期
-    const startDate = endDate.subtract(1, 'month'); // 当前日期的一个月前
-    setDateRange([startDate, endDate]); // 设置默认日期范围
-    handleSearch(startDate, endDate); // 默认查询过去一个月的数据
+    const endDate = dayjs(); 
+    const startDate = endDate.subtract(1, 'month');
+    setDateRange([startDate, endDate]); 
+    handleSearch(startDate, endDate);
   }, []);
 
   const generateData = (startDate, endDate) => {
-    const startDateStr = startDate.format('YYYY-MM-DDTHH:mm:ss'); // 转换为 ISO 8601 格式
+    const startDateStr = startDate.format('YYYY-MM-DDTHH:mm:ss');
     const endDateStr = endDate.format('YYYY-MM-DDTHH:mm:ss');
     let data;
   
@@ -29,16 +28,13 @@ const Statistical = () => {
       EndTime: endDateStr
     })
     .then((res) => {
-      
       if (res && Array.isArray(res.data)) {
-        // 确保正确处理 date 字段为字符串格式并转化为 dayjs 对象
         data = res.data.map(x => ({
           ...x, 
-          date: dayjs(x.date).format('YYYY-MM-DD'),  // 使用 dayjs 解析并格式化
+          date: dayjs(x.date).format('YYYY-MM-DD'),
           usageCount: x.usageCount
         }));
-        console.log(data)
-        message.info("查询成功！");
+        setData(data);
       }
     })
     .catch((error) => {
@@ -54,10 +50,7 @@ const Statistical = () => {
       message.error('请选择时间范围！');
       return;
     }
-
     setLoading(true);
-
-    // 生成并模拟请求数据
     const fetchedData = generateData(startDate, endDate);
     setData(fetchedData);
     setLoading(false);
@@ -65,7 +58,6 @@ const Statistical = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      {/* 顶部操作区 */}
       <Space style={{ marginBottom: 16, width: '100%', justifyContent: 'space-between' }}>
         <RangePicker
           value={dateRange}
@@ -81,7 +73,6 @@ const Statistical = () => {
         </Button>
       </Space>
 
-      {/* 折线统计图 */}
       <div style={{ marginTop: 20, height: '400px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
