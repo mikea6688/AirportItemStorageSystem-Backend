@@ -68,7 +68,7 @@ const Logistics = () => {
     const handleOrder = (data) => {
         setLoading(true);
         operateUserLogisticsOrder({
-            orderId: data.id,
+            id: data.id,
             operateType: data.operateType
         })
         .then((res)=>{
