@@ -242,14 +242,6 @@ export const operateUserOrder = (data) => {
     })
 }
 
-export const operateUserLogisticsOrder = (data) =>{
-    return http.post('/order/logistics/operate', data, {
-        headers: {
-            'userId': getUserId()
-        }
-    })
-}
-
 //#endregion
 
 //#region 统计api
