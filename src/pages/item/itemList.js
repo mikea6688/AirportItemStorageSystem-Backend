@@ -24,7 +24,7 @@ const ItemList = () => {
   // 分页信息
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 15,
+    pageSize: 5,
     total: 0,
   });
 
@@ -152,6 +152,7 @@ const ItemList = () => {
     }
   };
 
+  //查询
   const handleSearch = () => {
     setPagination((prev) => ({
       ...prev,

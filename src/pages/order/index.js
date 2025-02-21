@@ -15,11 +15,11 @@ const Order = () => {
   // 分页参数
   const [pagination, setPagination] = useState({
     current: 1,   
-    pageSize: 15, 
+    pageSize: 10, 
     total: 0,      
   });
 
-  const fetchData = (params = {}) => {
+  const fetchData = (page = pagination.current, pageSize = pagination.pageSize) => {
     setLoading(true);
     getAllOrder({
       cabinetNumber: searchText.cabinetNumber,  
@@ -28,12 +28,13 @@ const Order = () => {
       pageSize: pagination.pageSize,  
     })
     .then((res) => {
-      console.log("后端返回数据:", res); 
       if (res && Array.isArray(res.orders)) {
         setData(res.orders.map(x => ({ ...x, key: x.id })));
         setPagination(prev => ({
           ...prev,
-          total: res.total,
+          current: page,
+          pageSize: pageSize,
+          total: res.total
         }));
       } else {
         console.error("返回数据格式不正确:", res);
@@ -45,6 +46,11 @@ const Order = () => {
       setLoading(false);
       message.error("获取用户数据失败");
     });
+  };
+
+  //  处理分页
+  const handleTableChange = (pagination) => {
+    fetchData(pagination.current, pagination.pageSize);
   };
 
   // 查询功能
@@ -139,7 +145,14 @@ const Order = () => {
       </Space>
 
       {/* 表格展示柜子信息 */}
-      <Table columns={columns} dataSource={data} loading={loading} bordered />
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey={(record) => record.id}
+        loading={loading}
+        pagination={pagination}
+        onChange={handleTableChange}
+      />
     </div>
   );
 };

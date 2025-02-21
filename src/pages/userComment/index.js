@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Space, message, Modal, Form } from 'antd';
+import { Table, Input, Button, Space, message } from 'antd';
 import { DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import { getAllUserCommentData, deleteUserComment } from '../../api';
 
@@ -11,11 +11,11 @@ const UserComment = () => {
   const [pagination, setPagination] = useState({
     current: 1,    // 当前页
     pageSize: 10,  // 每页显示条数
-    total: 0,      // 总记录数
+    total: 0      // 总记录数
   });
 
   // 获取用户数据，处理分页和查询
-  const fetchData = (params = {}) => {
+  const fetchData = (page = pagination.current, pageSize = pagination.pageSize) => {
     setLoading(true);
     getAllUserCommentData({
       accountName: searchText.userAccount,
@@ -29,7 +29,9 @@ const UserComment = () => {
           setUserComments(res.userComments.map(comment => ({ ...comment, key: comment.id }))); // 确保 `key` 存在
           setPagination(prev => ({
             ...prev,
-            total: res.total, // 总记录数
+            current: page,
+            pageSize: pageSize,
+            total: res.total
           }));
         } else {
           console.error("返回数据格式不正确:", res);
@@ -41,6 +43,11 @@ const UserComment = () => {
         setLoading(false);
         message.error("获取用户数据失败");
       });
+  };
+
+  //  处理分页
+  const handleTableChange = (pagination) => {
+    fetchData(pagination.current, pagination.pageSize);
   };
 
   useEffect(() => {
@@ -134,7 +141,14 @@ const UserComment = () => {
       </Space>
 
       {/* 表格展示反馈信息 */}
-      <Table columns={columns} dataSource={userComments} bordered />
+      <Table
+        columns={columns}
+        dataSource={userComments}
+        rowKey={(record) => record.id}
+        loading={loading}
+        pagination={pagination}
+        onChange={handleTableChange}
+      />
     </div>
   );
 };

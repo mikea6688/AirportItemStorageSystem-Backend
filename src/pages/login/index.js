@@ -18,13 +18,11 @@ const LoginPage = () => {
         localStorage.setItem("token", token); 
         localStorage.setItem("user", JSON.stringify(userData));
 
-        // axios.defaults.headers['X-User-Id'] = userData.id;
-
         message.success("登录成功");
         navigate("/user");
       })
       .catch((error) => {
-        message.error(error.response);
+        message.error(error.response?.data?.message);
       })
       .finally(() => {
         setLoading(false);

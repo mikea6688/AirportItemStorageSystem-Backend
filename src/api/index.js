@@ -202,6 +202,14 @@ export const getOrderLogisticsList = (data) => {
     })
 }
 
+export const operateLogisticsOrder = (data) =>{
+    return http.post('/order/logistics/operate', data, {
+        headers: {
+            'userId': getUserId()
+        }
+    })
+}
+
 export const addLostOrder = (data) => {
     return http.post('/order/add', data, {
         headers: {

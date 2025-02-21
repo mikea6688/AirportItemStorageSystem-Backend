@@ -19,34 +19,34 @@ const User = () => {
     });
 
     // 获取用户数据，处理分页和查询
-    const fetchData = (params = {}) => {
+    const fetchData = (page = pagination.current, pageSize = pagination.pageSize) => {
         setLoading(true);
         getAllUserData({
             accountName: searchText.account,  // 获取查询条件
             nickName: searchText.name,        // 获取查询条件
-            pageIndex: pagination.current,     // 获取当前页
-            pageSize: pagination.pageSize,  // 获取每页条数
+            pageIndex: page,     // 获取当前页
+            pageSize: pageSize,  // 获取每页条数
         })
-            .then((res) => {
-                console.log("后端返回数据:", res);  // 确保数据结构正确
-                if (res && Array.isArray(res.users)) {
-                    setUsers(res.users.map(user => ({ ...user, key: user.id }))); // 确保 `key` 存在
-                    setPagination(prev => ({
-                        ...prev,
-                        total: res.total, // 总记录数
-                    }));
-                } else {
-                    console.error("返回数据格式不正确:", res);
-                }
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error("获取数据失败:", error);
-                setLoading(false);
-                message.error("获取用户数据失败");
-            });
+        .then((res) => {
+            if (res && Array.isArray(res.users)) {
+                setUsers(res.users.map(user => ({ ...user, key: user.id }))); // 确保 `key` 存在
+                setPagination(prev => ({
+                    ...prev,
+                    current: page,
+                    pageSize: pageSize,
+                    total: res.total
+                }));
+            } else {
+                console.error("返回数据格式不正确:", res);
+            }
+            setLoading(false);
+        })
+        .catch((error) => {
+            console.error("获取数据失败:", error);
+            setLoading(false);
+            message.error("获取用户数据失败");
+        });
     };
-
 
     // 初次加载数据
     useEffect(() => {
@@ -120,16 +120,7 @@ const User = () => {
 
     // 分页
     const handleTableChange = (pagination) => {
-        setPagination({
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-        });
-        // 当分页发生变化时，重新加载数据
-        fetchData({
-            page: pagination.current,
-            pageSize: pagination.pageSize,
-        });
+        fetchData(pagination.current, pagination.pageSize);
     };
 
     const roleTypeMap = {
@@ -191,8 +182,6 @@ const User = () => {
 
     return (
         <div style={{ padding: 20 }}>
-            
-
             <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
                 {/* <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>新增</Button> */}
                 <Space>
@@ -213,14 +202,10 @@ const User = () => {
             <Table
                 columns={columns}
                 dataSource={users}
+                rowKey={(record) => record.id}
                 loading={loading}
-                bordered
-                pagination={{
-                    current: pagination.current,
-                    pageSize: pagination.pageSize,
-                    total: pagination.total,
-                }}
-                onChange={handleTableChange} // 监听分页变化
+                pagination={pagination}
+                onChange={handleTableChange}
             />
 
             <Modal

@@ -15,17 +15,17 @@ const LostItemList = () => {
   // 分页参数
   const [pagination, setPagination] = useState({
     current: 1,   
-    pageSize: 15, 
+    pageSize: 10, 
     total: 0,      
   });
 
-  const fetchData = (params = {}) => {
+  const fetchData = (page = pagination.current, pageSize = pagination.pageSize) => {
     setLoading(true);
     getAllLostOrder({
       sizeType: searchParams.sizeType,  
       lostItemName: searchParams.lostItemName,      
-      pageIndex: pagination.current,     
-      pageSize: pagination.pageSize,  
+      pageIndex: page,     
+      pageSize: pageSize,  
     })
     .then((res) => {
       console.log("后端返回数据:", res); 
@@ -33,7 +33,9 @@ const LostItemList = () => {
         setData(res.orderLostItems.map(x => ({ ...x, key: x.id })));
         setPagination(prev => ({
           ...prev,
-          total: res.total,
+          current: page,
+          pageSize: pageSize,
+          total: res.total
         }));
       } else {
         setData([]);
@@ -48,9 +50,14 @@ const LostItemList = () => {
     });
   };
 
+  //  处理分页
+  const handleTableChange = (pagination) => {
+    fetchData(pagination.current, pagination.pageSize);
+  };
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [pagination.current, pagination.pageSize]);
 
   // 查询操作
   const handleSearch = () => {
@@ -188,9 +195,10 @@ const LostItemList = () => {
       <Table
         columns={columns}
         dataSource={data}
-        bordered
+        rowKey={(record) => record.id}
         loading={loading}
-        rowKey="key"
+        pagination={pagination}
+        onChange={handleTableChange}
       />
     </div>
   );

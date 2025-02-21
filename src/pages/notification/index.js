@@ -19,20 +19,22 @@ const Notification = () => {
     total: 0,
   });
 
-  const fetchData = (params = {}) => {
+  const fetchData = (page = pagination.current, pageSize = pagination.pageSize) => {
     setLoading(true);
     getAllNotification({
       title: searchText.title,
       author: searchText.author,
-      pageIndex: pagination.current,
-      pageSize: pagination.pageSize,
+      pageIndex: page,
+      pageSize: pageSize,
     })
       .then((res) => {
         if (res && Array.isArray(res.notifications)) {
           setNotifications(res.notifications.map(notification => ({ ...notification, key: notification.id })));
           setPagination(prev => ({
             ...prev,
-            total: res.total,
+            current: page,
+            pageSize: pageSize,
+            total: res.total
           }));
         }
         setLoading(false);
@@ -41,6 +43,11 @@ const Notification = () => {
         setLoading(false);
         message.error("获取公告数据失败");
       });
+  };
+
+  //  处理分页
+  const handleTableChange = (pagination) => {
+    fetchData(pagination.current, pagination.pageSize);
   };
 
   useEffect(() => {
@@ -256,10 +263,10 @@ const Notification = () => {
       <Table
         columns={columns}
         dataSource={notifications}
-        bordered
-        pagination={pagination}
+        rowKey={(record) => record.id}
         loading={loading}
-        onChange={(pagination) => setPagination({ ...pagination })}
+        pagination={pagination}
+        onChange={handleTableChange}
         scroll={{ x: 'max-content' }}
       />
 
