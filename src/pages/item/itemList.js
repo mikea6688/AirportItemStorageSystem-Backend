@@ -255,7 +255,7 @@ const ItemList = () => {
           <Form.Item name="name" label="柜子名称" rules={[{ required: true, message: "请输入柜子名称" }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="sizeType" label="柜子规模" rules={[{ required: true, message: "请输入柜子规模" }]}>
+          <Form.Item name="size" label="柜子规模" rules={[{ required: true, message: "请输入柜子规模" }]}>
             <Select>
               <Select.Option value='Small'>小</Select.Option>
               <Select.Option value="Medium">中</Select.Option>

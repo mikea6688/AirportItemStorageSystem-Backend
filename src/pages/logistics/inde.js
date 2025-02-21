@@ -160,7 +160,7 @@ const Logistics = () => {
                         disabled={record.logisticsStatus !== 'Pending'}
                         onClick={() => confirmDelivery(record.key)}
                     >
-                        寄出
+                        确认寄出
                     </Button>
                     <Button
                         disabled={record.logisticsStatus !== 'InTransit'}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Input, Tag, Button, Space, Select, message, Modal, Form } from 'antd';
 import { DeleteOutlined, SearchOutlined, SendOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import { getAllLostOrder } from '../../api';
+import { getAllLostOrder, deleteLostItemOrder, operateUserOrder } from '../../api';
 
 const { Option } = Select;
 
@@ -65,23 +65,44 @@ const LostItemList = () => {
   };
 
   // 删除操作
-  const handleDelete = (key) => {
+  const handleDelete = (id) => {
     Modal.confirm({
       title: '确定删除此物品存储记录吗？',
       onOk: () => {
-        setData(data.filter(item => item.key !== key));
-        message.success('删除成功');
-      },
+        deleteLostItemOrder(id)
+        .then((res =>{
+          if(res === 1){
+            message.success('删除成功!');
+            setData(data.filter(item => item.orderId !== id));
+          }
+          else{
+            message.error('删除失败！')
+          }
+        }))
+        .catch((error) =>{
+          message.error('提交删除异常，请稍后再试')
+        })
+      }
     });
   };
 
-  const handleTakeOut = (key) => {
+  const handleTakeOut = (orderId) => {
     Modal.confirm({
       title: '确定取走遗失物品吗？',
       onOk: () => {
-        setData(data.filter(item => item.key !== key));
-        message.success('成功取走！');
-      },
+        operateUserOrder({
+            orderId: orderId,
+            operateType: 'TakeOut',
+            isLostItemOrder: true
+        })
+        .then((res) =>{
+          message.success('成功取走！');
+          fetchData()
+        })
+        .catch((error) => {
+          message.error("提取失败！")
+        })
+      }
     });
   };
 
@@ -142,15 +163,16 @@ const LostItemList = () => {
       render: (text, record) => (
         <Space size="middle">
           <Button
+            disabled={record.storageStatus != 'Using'}
             icon= {<SendOutlined />}
-            onClick={() => handleTakeOut(record.key)}
+            onClick={() => handleTakeOut(record.orderId)}
           >
             取出
           </Button>
           <Button
             icon={<DeleteOutlined />}
             danger
-            onClick={() => handleDelete(record.key)}
+            onClick={() => handleDelete(record.orderId)}
           >
             删除
           </Button>
