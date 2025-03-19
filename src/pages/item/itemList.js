@@ -84,6 +84,7 @@ const ItemList = () => {
   // 新增或编辑数据
   const handleOk = () => {
     form.validateFields().then((values) => {
+      setLoading(true);
       console.log("🔵 提交数据：", values);
       try {
         if (editingCabinet) {
@@ -91,7 +92,7 @@ const ItemList = () => {
             id: editingCabinet.id,
             name: values.name,
             num: values.num,
-            sizeType: values.sizeType,
+            sizeType: values.size,
           };
           updateCabinet(updateData)
           .then((res) => {
@@ -104,15 +105,15 @@ const ItemList = () => {
             message.error('柜子信息更新失败');
           });
         } else {
+          console.log("🔵 新增数据：", values);
           const addData = {
             name: values.name,
             num: values.num,
-            sizeType: values.sizeType,
+            sizeType: values.size,
           }
           console.log("🔵 新增数据：", addData);
           addCabinet(addData).then((res)=>{
             if(res === 1){
-              loadData(); // 重新加载数据
               message.success("新增柜子成功！");
             }
             else{
@@ -120,10 +121,11 @@ const ItemList = () => {
             }
           });
         }
-        setIsModalOpen(false);
       } catch {
         message.error("操作失败");
       }
+      loadData(); // 重新加载数据
+      setIsModalOpen(false);
     }).catch((error) => {
       message.error("请完整填写所有信息");
     });
