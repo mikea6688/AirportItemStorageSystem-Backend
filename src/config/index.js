@@ -55,6 +55,12 @@ export default [
                 name: 'configSetting',
                 label: '配置设置',
                 icon: 'AppstoreOutlined',
+            },
+            {
+                path: '/item/category',
+                name: 'category',
+                label: '类别设置',
+                icon: 'AppstoreOutlined',
             }
         ]
     },

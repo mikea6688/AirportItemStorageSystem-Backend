@@ -255,3 +255,40 @@ export const getOrderStatistical = (data) =>{
 }
 
 //#endregion
+
+
+//#region 
+
+export const addStorageCategory = (data) => {
+    return http.post('/storage/category/add', data, {
+        headers: {
+            'userId': getUserId()
+        }
+    })
+}
+
+export const updateStorageCategory = (data) => {
+    return http.post('/storage/category/update', data, {
+        headers: {
+            'userId': getUserId()
+        }
+    })
+}
+
+export const deleteStorageCategory = (data) => {
+    return http.post('/storage/category/delete', data, {
+        headers: {
+            'userId': getUserId()
+        }
+    })
+}
+
+export const getAllStorageCategories = (data) => {
+    return http.get('/storage/category/list', data, {
+        headers: {
+            'userId': getUserId()
+        }
+    })
+}
+
+//#endregion

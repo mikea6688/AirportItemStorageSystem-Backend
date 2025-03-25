@@ -11,6 +11,7 @@ import LoginPage from '../pages/login';
 import LostItemList from '../pages/lostItem/lostItemList';
 import LostItemStorage from '../pages/lostItem/lostItemStorage';
 import Logistics from '../pages/logistics/inde';
+import ItemCategory from '../pages/item/itemCategory';
 
 // 保护路由组件
 const ProtectedRoute = ({ children }) => {
@@ -65,6 +66,10 @@ const routes = [
                     {
                         path: 'configSetting',
                         element: <ProtectedRoute><ItemConfigSetting /></ProtectedRoute>, 
+                    },
+                    {
+                        path: 'category',
+                        element: <ProtectedRoute><ItemCategory /></ProtectedRoute>
                     }
                 ]
             },
