@@ -125,7 +125,7 @@ const Order = () => {
             disabled={record.status === "Discarded" || record.status === "TakenOut" || record.isPayment}
             onClick={() => handleDiscard(record.key)}
           >
-            续费
+            续期
           </Button>
         </Space>
       ),
