@@ -4,6 +4,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { getAllOrder } from '../../api';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import moment from 'moment';
 
 dayjs.extend(duration);
 
@@ -85,6 +86,7 @@ const Order = () => {
     {
       title: '存储时间',
       dataIndex: 'storageDate',
+      render: (text) => moment(text).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: '已存时间',
@@ -113,9 +115,17 @@ const Order = () => {
         <Space>
           <Button
             danger
+            disabled={record.status === "Discarded" || record.status === "TakenOut" || record.isStorageTimeout || record.isPayment}
             onClick={() => handleDiscard(record.key)}
           >
             丢弃
+          </Button>
+          <Button
+            color="cyan" variant="solid"
+            disabled={record.status === "Discarded" || record.status === "TakenOut" || record.isPayment}
+            onClick={() => handleDiscard(record.key)}
+          >
+            续费
           </Button>
         </Space>
       ),
@@ -152,7 +162,16 @@ const Order = () => {
         loading={loading}
         pagination={pagination}
         onChange={handleTableChange}
+        rowClassName={(record) => (record.isStorageTimeout ? 'storage-timeout' : '')}
       />
+
+      {/* 添加样式 */}
+      <style jsx>{
+        `.storage-timeout {
+        background-color: red; /* 设置背景颜色为红色 */
+        color: white; /* 可选：调整文字颜色以提高可读性 */
+      }`
+      }</style>
     </div>
   );
 };
