@@ -16,17 +16,18 @@ const Order = () => {
   // 分页参数
   const [pagination, setPagination] = useState({
     current: 1,   
-    pageSize: 10, 
+    pageSize: 9, 
     total: 0,      
   });
 
-  const fetchData = (page = pagination.current, pageSize = pagination.pageSize) => {
+  const fetchData = (page = pagination.current, pageSize = pagination.pageSize, isQueryExpiredOrder = false) => {
     setLoading(true);
     getAllOrder({
       cabinetNumber: searchText.cabinetNumber,  
       username: searchText.username,      
       pageIndex: pagination.current,     
       pageSize: pagination.pageSize,  
+      isExpiredOrder: isQueryExpiredOrder
     })
     .then((res) => {
       if (res && Array.isArray(res.orders)) {
@@ -55,12 +56,8 @@ const Order = () => {
   };
 
   // 查询功能
-  const handleSearch = () => {
-    const filteredData = data.filter(item =>
-      (searchText.storedBy ? item.storedBy.includes(searchText.storedBy) : true) &&
-      (searchText.cabinetId ? item.cabinetId.includes(searchText.cabinetId) : true)
-    );
-    setData(filteredData);
+  const handleSearch = (expiredOrder) => {
+    fetchData(1, pagination.pageSize, expiredOrder);
   };
 
   useEffect(() => {
@@ -97,6 +94,11 @@ const Order = () => {
       }
     },
     {
+      title: '预计到期时间',
+      dataIndex: 'estimatedTime',
+      render: (text) => moment(text).format('YYYY-MM-DD'),
+    },
+    {
       title: '存储凭证',
       dataIndex: 'voucherNumber',
     },
@@ -120,13 +122,6 @@ const Order = () => {
           >
             丢弃
           </Button>
-          <Button
-            color="cyan" variant="solid"
-            disabled={record.status === "Discarded" || record.status === "TakenOut" || record.isPayment}
-            onClick={() => handleDiscard(record.key)}
-          >
-            续期
-          </Button>
         </Space>
       ),
     },
@@ -148,8 +143,16 @@ const Order = () => {
             value={searchText.cabinetNumber}
             onChange={(e) => setSearchText({ ...searchText, cabinetNumber: e.target.value })}
           />
-          <Button icon={<SearchOutlined />} type="primary" onClick={handleSearch}>
+          <Button icon={<SearchOutlined />} type="primary" onClick={() => handleSearch(false)}>
             查询
+          </Button>
+          <Button
+            icon={<SearchOutlined />}
+            type="primary"
+            onClick={() => handleSearch(true)}
+            style={{ backgroundColor: 'orange', borderColor: 'darkorange' }} // 自定义样式
+          >
+            待处理过期订单
           </Button>
         </Space>
       </Space>
@@ -165,7 +168,7 @@ const Order = () => {
         rowClassName={(record) => (record.isStorageTimeout ? 'storage-timeout' : '')}
       />
 
-      {/* 添加样式 */}
+      {/* 添加过期订单样式 */}
       <style jsx>{
         `.storage-timeout {
         background-color: red; /* 设置背景颜色为红色 */

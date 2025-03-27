@@ -24,7 +24,7 @@ const ItemList = () => {
   // 分页信息
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 5,
+    pageSize: 8,
     total: 0,
   });
 
